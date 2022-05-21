@@ -486,6 +486,11 @@ progress {
   vertical-align: baseline;
 }
 
+.addScroll{
+  height: calc(100vh - 110px);
+  overflow-y: scroll;
+}
+
 [hidden] {
   display: none !important;
 }

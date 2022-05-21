@@ -1,5 +1,6 @@
 <?php
   require("config.php");
+  session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,35 +19,6 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-          <script>
-          $(document).ready(function(){
-            load_data();
-            function load_data(query)
-            {
-              $.ajax({
-              url:"ajax-live-search-founditems.php",
-              method:"POST",
-              data:{query:query},
-              success:function(data)
-              {
-                $('#result').html(data);
-              }
-              });
-            }
-            $('#search').keyup(function(){
-            var search = $(this).val();
-            if(search != '')
-            {
-              load_data(search);
-            }
-            else
-            {
-              load_data();
-            }
-            });
-          });
-          </script>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -59,107 +31,90 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="adminClaimApprovalRequest.php">Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="adminFoundItemsPage.php">Main Page</a></li>
                         <li class="nav-item"><a class="nav-link" href="addItemPage.php">Add Item</a></li>
                         <li class="nav-item"><a class="nav-link" href="login.php">Logout</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-
         <!-- Masthead-->
         <header class="masthead">
                 <div class="container-fluid h-custom">
                   <div class="row d-flex justify-content-center align-items-center h-100">
                     
                       <!-- Found Items List -->
-                      <div class="masthead-subheading">Found Items</div>
+                      <div class="masthead-subheading">Claim Requests</div>
                       <div>
                       <div class="main-wrapper">
                         <div class="container main-container">
                           <div class="searchBackground">
-
-                          <input type="text" name="search" id="search" placeholder="Search" class="form-control" />
-			                    <div id="result"></div>
-                          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-                          <script type="text/javascript">
-                              $(document).ready(function () {
-                                  $("#live_search").keyup(function () {
-                                      var query = $(this).val();
-                                      if (query != "") {
-                                          $.ajax({
-                                              url: 'ajax-live-search-founditems.php',
-                                              method: 'POST',
-                                              data: {
-                                                  query: query
-                                              },
-                                              success: function (data) {
-                                                  $('#search_result').html(data);
-                                                  $('#search_result').css('display', 'block');
-                                                  $("#live_search").focusout(function () {
-                                                      $('#search_result').css('display', 'none');
-                                                  });
-                                                  $("#live_search").focusin(function () {
-                                                      $('#search_result').css('display', 'block');
-                                                  });
-                                              }
-                                          });
-                                      } else {
-                                          $('#search_result').css('display', 'none');
-                                      }
-                                  });
-                              });
-                          </script>
                           <?php
-                              /*$founditems = $conn->query("SELECT * FROM i_item WHERE i_isOld = 0 AND i_isApproved = 1");
+                              $founditems = $conn->query("SELECT * from hilfe.u_user
+                                                          inner join hilfe.r_request
+                                                          On hilfe.u_user.u_id = hilfe.r_request.r_u_id 
+                                                          inner join hilfe.i_item
+                                                          On hilfe.i_item.i_id = hilfe.r_request.r_i_id
+                                                          WHERE i_isApproved = 1 AND r_isHandled = 0");
                               if ($founditems->num_rows > 0) {
                                 while($row = $founditems->fetch_assoc()) {
+                                  $date = new DateTime($row["i_timestamp"]);
+                                  $date->modify('+3 month');
+                                  if($row["i_timestamp"] <= $date) {
                                     echo '<div class="row main-row">
                                             <div class="col-12 align-center">
                                               <div class="row p-3">
                                                 <div class="col-1 align-middle">
                                                     <img src="assets/img/items/'.$row["i_image"].'" style="max-width: 50px;">
                                                 </div>
-                                                <div class="col-2 align-middle responsive-text">
+                                                <div class="col-1 align-middle responsive-text">
                                                     ID:     '. $row["i_id"].'-'. $row["i_name"].'
                                                 </div>
                                                 <div class="col-2 responsive-text">
-                                                    Timestamp:       '. $row["i_timestamp"].'
+                                                    Name:       '.$row["u_firstname"].' '.$row["u_lastname"].'
+                                                </div>
+                                                <div class="col-3 responsive-text">
+                                                    Email:       '. $row["u_email"].'
                                                 </div>
                                                 <div class="col-2 responsive-text">
-                                                    Owner:       '. $row["i_owner"].' <br>
-                                                    Returner:       '. $row["i_nameReturnedPerson"].'
+                                                    Num:       '. $row["u_number"].'
                                                 </div>
-                                                <div class="col-2 responsive-text">
-                                                    Num:       '. $row["i_phoneNumber"].' <br>
-                                                    Num:       '. $row["i_numberReturnedPerson"].'
-                                                </div>
-                                                <div class="col-2">
-                                                  <a href="delete.php?id='.$row['i_id'].'"><button type="button" class="btn btn-primary btn-block">Delete</button></a>
-                                              
-                                                  <a href="addFoundItemPage.php?id='.$row['i_id'].'"><button type="button" class="btn btn-info btn-block">Found</button></a>
+                                                <div class="col-3">
+                                                    <a href="approve.php?id='.$row['r_id'].'&u_id='. $row["u_id"].'&i_id='. $row["i_id"].'"><button type="button" class="btn btn-info btn-block">Approve</button></a>
+                                                
+                                                    <a href="disapprove.php?id='.$row['i_id'].'"><button type="button" class="btn btn-primary btn-block">Disapprove</button></a>
                                                 </div>
                                               </div>
                                             </div>
                                           </div>';
+                                  }else{
+                                    $id = $row["i_id"];
+                                    $conn->query("UPDATE i_item SET i_isOld = 1 WHERE i_id = '$id'");
+                                  }
                                 }
                               } else {
+                                  
                                   echo "No entries!";
                               }
-                        */  ?>
+                          ?>
                           </div>
                         </div>
                         </div>
                       </div>
 
                       <!-- Found Old Items List -->
-                      <div class="masthead-subheading" style="padding-top: 20px;">Approved Items</div>
+                      <div class="masthead-subheading" style="padding-top: 20px;">New item requests</div>
                       <div class="main-wrapper">
                         <div class="container main-container">
                           <div class="searchBackground">
                           <?php
-                              $founditems = $conn->query("SELECT * FROM i_item WHERE i_isOld = 1 AND i_isApproved = 1");
+                              $founditems = $conn->query("SELECT * from hilfe.u_user
+                                                          inner join hilfe.r_request
+                                                          On hilfe.u_user.u_id = hilfe.r_request.r_u_id 
+                                                          inner join hilfe.i_item
+                                                          On hilfe.i_item.i_id = hilfe.r_request.r_i_id
+                                                          WHERE i_isApproved = 0 AND r_isHandled = 0");
+
                               if ($founditems->num_rows > 0) {
                                 while($row = $founditems->fetch_assoc()) {
                                     echo '<div class="row main-row">
@@ -168,32 +123,31 @@
                                                 <div class="col-1 align-middle">
                                                     <img src="assets/img/items/'.$row["i_image"].'" style="max-width: 50px;">
                                                 </div>
-                                                <div class="col-2 align-middle responsive-text">
+                                                <div class="col-1 align-middle responsive-text">
                                                     ID:     '. $row["i_id"].'-'. $row["i_name"].'
                                                 </div>
                                                 <div class="col-2 responsive-text">
-                                                    Timestamp:       '. $row["i_timestamp"].'
+                                                    Name:       '.$row["u_firstname"].' '.$row["u_lastname"].'
+                                                </div>
+                                                <div class="col-3 responsive-text">
+                                                    Email:       '. $row["u_email"].'
                                                 </div>
                                                 <div class="col-2 responsive-text">
-                                                    Owner:       '. $row["i_owner"].' <br>
-                                                    Returner:       '. $row["i_nameReturnedPerson"].'
+                                                    Num:       '. $row["u_number"].'
                                                 </div>
-                                                <div class="col-2 responsive-text">
-                                                    Num:       '. $row["i_phoneNumber"].' <br>
-                                                    Num:       '. $row["i_numberReturnedPerson"].'
-                                                </div>
-                                                <div class="col-2">
-                                                  <a href="delete.php?id='.$row['i_id'].'"><button type="button" class="btn btn-primary btn-block">Delete</button></a>                                            
-                                                  <a href="disapproveFoundItem.php?id='.$row['i_id'].'"><button type="button" class="btn btn-warning btn-block">Disapprove</button></a>
+                                                <div class="col-3">
+                                                    <a href="approveItem.php?id='.$row['r_id'].'&u_id='. $row["u_id"].'&i_id='. $row["i_id"].'"><button type="button" class="btn btn-info btn-block">Approve</button></a>
+                                                
+                                                    <a href="disapproveItem.php?id='.$row['r_id'].'&u_id='. $row["u_id"].'&i_id='. $row["i_id"].'"><button type="button" class="btn btn-primary btn-block">Disapprove</button></a>
                                                 </div>
                                               </div>
                                             </div>
                                           </div>';
                                 }
                               } else {
-                                  echo "No entries!";
+                                echo "No entries!";
                               }
-                           ?>
+                          ?>
                           </div>
                         </div>
                       </div>

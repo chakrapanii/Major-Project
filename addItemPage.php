@@ -23,7 +23,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="index.html"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
+            <a class="navbar-brand" href="login.php"><img style="height: 70px;" src="assets/img/logo.png" alt="..." /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -31,7 +31,8 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link" href="adminFoundItemsPage.php">Main Page</a></li>
-                        <li class="nav-item"><a class="nav-link" href="index.html">Logout</a></li>
+                        <li class="nav-item"><a class="nav-link" href="adminClaimApprovalRequest.php">Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="login.php">Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -40,17 +41,30 @@
         <header class="masthead">
                 <div class="container-fluid h-custom">
                   <div class="row d-flex justify-content-center align-items-center h-100">
-                    
+                  <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                       <!-- Found Items List -->
-                      <div class="masthead-subheading">Found Items</div>
+                      <div class="masthead-subheading">Create an Item</div>
                         <form method="POST" action="" enctype="multipart/form-data">
-                            <input type="file" name="uploadfile" value=""/>
-                                
-                            <div>
-                                <button type="submit" name="upload">UPLOAD</button>
+                        <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Item-name" name="itemname" required/>
                                 </div>
+                                <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Returners Name" name="personname" required/>
+                                </div>
+                                <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Returners Number" name="personnumber" required/>
+                                </div>
+                            <div class="masthead-subheading">Item Image</div>
+                            <input type="file" name="uploadfile" value=""/>
+                            <div>
+                            <button type="submit" class="btn btn-primary btn-lg"
+                                style="margin-top: 2.5rem;" name="upload">UPLOAD</button>
+                            </div>
                         </form>
-                      
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -91,10 +105,12 @@
             $filename = $_FILES["uploadfile"]["name"];
             $tempname = $_FILES["uploadfile"]["tmp_name"];    
             $folder = "assets/img/items/".$filename;
-            
+            $name = $_POST['itemname'];
+            $personname = $_POST['personname'];
+            $personnumber = $_POST['personnumber'];
     
             //Get all the submitted data from the form
-            $sql = "INSERT INTO i_item (i_image) VALUES ('$filename')";
+            $sql = "INSERT INTO i_item (i_image, i_name, i_nameReturnedPerson, i_numberReturnedPerson, i_createdUserId) VALUES ('$filename', '$name', '$personname', '$personnumber', 0)";
     
             //Execute query
             mysqli_query($conn, $sql);
@@ -106,13 +122,4 @@
                 $msg = "Failed to upload image";
         }
     }
-    /*$result = mysqli_query($conn, "SELECT * FROM i_item");
-    while($data = mysqli_fetch_array($result))
-    {
-    
-        ?>
-    <img src="<?php echo $data['Filename']; ?>">
-    
-    <?php
-    }*/
 ?>

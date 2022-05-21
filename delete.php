@@ -14,6 +14,11 @@
     // sql to delete a record
     $sql = "DELETE FROM i_item WHERE i_id = $id"; 
 
+    if($_GET["rid"]) {
+        $rid = $_GET["rid"];
+        $conn->query("DELETE FROM `r_request` WHERE r_id = $rid");
+    }
+
     if (mysqli_query($conn, $sql)) {
         mysqli_close($conn);
         header('Location: adminFoundItemsPage.php'); //If book.php is your main page where you list your all records

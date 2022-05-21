@@ -1,6 +1,3 @@
-<?php
-  require("config.php");
-?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -23,7 +20,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="index.html"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
+            <a class="navbar-brand" href="login.php"><img style="height: 70px;" src="assets/img/logo.png" alt="..." /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -31,7 +28,7 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link" href="adminFoundItemsPage.php">Main Page</a></li>
-                        <li class="nav-item"><a class="nav-link" href="index.html">Logout</a></li>
+                        <li class="nav-item"><a class="nav-link" href="login.php">Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -44,21 +41,26 @@
                         <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                       
                         <div class="masthead-subheading">Add Found Item to Old List</div>
-                            <form action="login.php" method="POST">
+                            <form method="POST" action="" enctype="multipart/form-data">
                                 <div class="form-outline mb-4">
-                                <input type="email" id="form3Example3" class="form-control form-control-lg"
-                                    placeholder="Owners Name" name="owner" required/>
+                                <input type="text" id="form3Example3" class="form-control form-control-lg"
+                                    placeholder="Owners Name" name="itemname" required/>
                                 </div>
-                    
-                            
+            
                                 <div class="form-outline mb-3">
-                                <input type="password" id="form3Example4" class="form-control form-control-lg"
-                                    placeholder="Owners Phonenumber" name="phonenumber" required/>
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Owners Phonenumber" name="number" required/>
+                                </div>
+
+                                <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Email of Founder" name="emailfounder"/>
                                 </div>
                     
                                 <div class="text-center text-lg-start mt-4 pt-2">
-                                <button type="button" class="btn btn-primary btn-lg"
-                                    style="padding-left: 2.5rem; padding-right: 2.5rem;" name="submit">Add Item</button>
+                                <button type="submit" class="btn btn-primary btn-lg"
+                                    style="margin-top: 2.5rem;" name="upload">Change Item</button>
+                                </div>
                                 </div>
                     
                             </form>
@@ -94,3 +96,24 @@
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     </body>
 </html>
+
+<?php 
+    require("config.php");
+    if (isset($_POST['upload'])) {
+            $id = $_GET['id'];
+            $name = $_POST['itemname'];
+            $number = $_POST['number'];
+           
+            $sql = "UPDATE i_item SET i_owner = '$name', i_phoneNumber = '$number', i_isOld = 1 WHERE i_id = '$id'";
+    
+            //Execute query
+            mysqli_query($conn, $sql);
+
+
+            $emailfounder = $_POST['emailfounder'];
+                
+            $sqlnew = "UPDATE u_user SET u_countFound = u_countFound + 1 WHERE u_email = '$emailfounder'";
+
+            mysqli_query($conn, $sqlnew);
+    }
+ ?>

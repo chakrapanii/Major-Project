@@ -20,7 +20,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="index.html"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
+                <a class="navbar-brand" href="login.php"><img style="height: 70px;" src="assets/img/logo.png" alt="..." /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -29,11 +29,11 @@
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>
                         <li class="nav-item"><a class="nav-link" href="signup.php">SignUp</a></li>
-                        <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
+
         <!-- Masthead-->
         <header class="masthead">
             <div class="container">
@@ -42,6 +42,7 @@
                 <a class="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a>
             </div>
         </header>
+
         <!-- Services-->
         <section class="page-section" id="services">
             <div class="container">
@@ -78,11 +79,55 @@
             </div>
         </section>
 
+        <!-- Most Found-->
+        <section class="page-section" id="services">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">Most Found Items</h2>
+                    <h3 class="section-subheading text-muted">Ranking of the people who found the most items:</h3>
+                </div>
+                <div style="color: white;" class="main-wrapper">
+                        <div class="container main-container">
+                          <div class="searchBackground">
+                          <?php
+                              require("config.php");
+                              $counter = 0;
+                              $founditems = $conn->query("SELECT * FROM u_user WHERE u_countFound > 0 ORDER BY u_countFound DESC");
+                              if ($founditems->num_rows > 0) {
+                                while($row = $founditems->fetch_assoc()) {
+                                    $counter++;
+                                    echo '<div class="row main-row">
+                                            <div class="col-12 align-center">
+                                              <div class="row p-3">
+                                                <div class="col-4"></div>
+                                                <div class="col-1 masthead-subheading">
+                                                    <h4 style="color: #ffc014">'.$counter.'.</h4>
+                                                </div>
+                                                <div class="col-4 masthead-subheading">
+                                                    <h5 style="color: #ffc014">Name: '.$row["u_firstname"].' '.$row["u_lastname"].'</h5>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>';
+                                }
+                              } else {
+                                  echo "<div style='padding: 10px;'>No entries!</div>";
+                              }
+                          ?>
+                       
+                          </div>
+                        
+                        </div>
+                      </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Footer-->
         <footer class="footer py-4" style="background-color: #212529;">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-4 text-lg-start">Copyright &copy; Your Website 2022</div>
+                    <div class="col-lg-4 text-lg-start">Copyright</div>
                     <div class="col-lg-4 my-3 my-lg-0">
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>

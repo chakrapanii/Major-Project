@@ -1,4 +1,5 @@
 <?php
+  require("config.php");
   session_start();
 ?>
 <!DOCTYPE html>
@@ -8,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Lost And Found Page</title>
+        <title>Agency - Start Bootstrap Theme</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Font Awesome icons (free version)-->
@@ -30,52 +31,51 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="signup.php">SignUp</a></li>
+                        <li class="nav-item"><a class="nav-link" href="userFoundItemsPage.php">Main Page</a></li>
+                        <li class="nav-item"><a class="nav-link" href="login.php">Logout</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
+
         <!-- Masthead-->
         <header class="masthead">
-            <section>
                 <div class="container-fluid h-custom">
                   <div class="row d-flex justify-content-center align-items-center h-100">
-                    <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                    <div class="masthead-subheading">Log In</div>
-                    <form method="POST" action="" enctype="multipart/form-data">
-                        <div class="form-outline mb-4">
-                          <input type="text" id="form3Example3" class="form-control form-control-lg"
-                            placeholder="Email adress" name="email" required/>
-                        </div>
-              
-                      
+                  <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                      <!-- Found Items List -->
+                      <div class="masthead-subheading">Name of the Item you have lost:</div>
+                        <form method="POST" action="" enctype="multipart/form-data">
                         <div class="form-outline mb-3">
-                          <input type="password" id="form3Example4" class="form-control form-control-lg"
-                            placeholder="Password" name="password" required/>
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Item-name" name="itemname" required/>
+                                </div>
+                                <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Returners Name" name="personname" required/>
+                                </div>
+                                <div class="form-outline mb-3">
+                                <input type="text" id="form3Example4" class="form-control form-control-lg"
+                                    placeholder="Returners Number" name="personnumber" required/>
+                                </div>
+                            <div class="masthead-subheading">Item Image</div>
+                            <input type="file" name="uploadfile" value=""/>
+                            <div>
+                            <button type="submit" class="btn btn-primary btn-lg"
+                                style="margin-top: 2.5rem;" name="upload">UPLOAD</button>
+                            </div>
+                        </form>
                         </div>
-              
-                        <div class="text-center text-lg-start mt-4 pt-2">
-                        <button type="submit" class="btn btn-primary btn-lg"
-                                style="margin-top: 2.5rem;" name="upload">Log In</button>
-                          <p class="small fw-bold mt-2 pt-1 mb-0">Dont have an account? <a href="signup.php"
-                              class="link-danger" name="sumbit">Sign Up</a></p>
-                        </div>
-              
-                      </form>
                     </div>
                   </div>
                 </div>
-
-              </section>
-    
         </header>
 
         <!-- Footer-->
-        <footer class="footer py-4" style="background-color: #212529;">
+        <footer class="footer py-4 navbar-fixed-bottom" style="background-color: #212529;">
             <div class="container">
                 <div class="row align-items-center">
-                <div class="col-lg-4 text-lg-start">Copyright</div>
+                    <div class="col-lg-4 text-lg-start">Copyright &copy; Your Website 2022</div>
                     <div class="col-lg-4 my-3 my-lg-0">
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </footer>
-
+        
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
@@ -97,27 +97,34 @@
     </body>
 </html>
 
-
 <?php
-    require('config.php');
+    require("config.php");
+    $msg = "";
     if (isset($_POST['upload'])) {
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $password = mysqli_real_escape_string($conn, $_POST['password']);
+    
+            $filename = $_FILES["uploadfile"]["name"];
+            $tempname = $_FILES["uploadfile"]["tmp_name"];    
+            $folder = "assets/img/items/".$filename;
+            $name = $_POST['itemname'];
 
-        if($email == "admin" && $password == "321456") {
-          echo "<script>location.href = 'adminFoundItemsPage.php';</script>";
-        }else{
-          $password = md5($password);
-          $query = "SELECT * FROM u_user WHERE u_email='$email' AND u_password='$password'";
-          $results = mysqli_query($conn, $query);
-          if (mysqli_num_rows($results) == 1) {
-            $row = $results -> fetch_assoc();
-            $_SESSION["userid"] = $row["u_id"];
-            echo "<script>location.href = 'userFoundItemsPage.php';</script>";
-          }else {
-            echo "<script> alert('Wrong Email/Password combination!')</script>";
-          }
+            $id = $_SESSION["userid"];
+            $personname = $_POST['personname'];
+            $personnumber = $_POST['personnumber'];
+    
+            //Get all the submitted data from the form
+            $sql = "INSERT INTO i_item (i_image, i_name, i_isApproved, i_createdUserId, i_nameReturnedPerson, i_numberReturnedPerson) VALUES ('$filename', '$name', 0, '$id', '$personname', '$personnumber')";
+            mysqli_query($conn, $sql);
+            
+            $last_id = $conn->insert_id;
+            $uid = isset($_SESSION["userid"]);
+            $query = "INSERT INTO `r_request` (r_u_id, r_i_id) VALUES ('$uid', '$last_id')";
+            mysqli_query($conn, $query);
+             
+
+            if (move_uploaded_file($tempname, $folder))  {
+                $msg = "Image uploaded successfully";
+            }else{
+                $msg = "Failed to upload image";
         }
-      }
- 
+    }
 ?>
